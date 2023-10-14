@@ -1,15 +1,24 @@
 #!/usr/bin/python3
-"""Solves the lock boxes puzzle """
+"""0-lockboxes"""
 
 def canUnlockAll(boxes):
-         unlocked = set()
+    """_summary_
 
-    for box_id, box in enumerate(boxes):
-        if len(box) == 0 or box_id == 0:
-            unlocked.add(box_id)
-        for key in box:
-            if key < len(boxes) and key != box_id:
-                unlocked.add(key)
-        if len(unlocked) == len(boxes):
-            return True
+    Args:
+        boxes (Array): Array of boxes
+
+    Returns:
+        Boolean: true if all boxes can be opened, else false
+    """
+    if len(boxes) == 0:
+        return False
+    if len(boxes) == 1:
+        return True
+    keys = [0]
+    for key in keys:
+        for new_key in boxes[key]:
+            if new_key not in keys and new_key < len(boxes):
+                keys.append(new_key)
+    if len(keys) == len(boxes):
+        return True
     return False
