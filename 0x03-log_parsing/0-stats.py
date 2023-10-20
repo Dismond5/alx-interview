@@ -1,31 +1,34 @@
 #!/usr/bin/python3
 import sys
-from collections import defaultdict
+import re
+
+from collections import Counter
+
+STATUS_CODES = [200, 301, 400, 401, 403, 404, 405, 500]
 
 total_file_size = 0
-status_code_counts = defaultdict(int)
-lines_processed = 0
+status_code_counts = Counter()
+line_count = 0
+
+def print_stats():
+  print("Total file size: %d" % total_file_size)
+  for status_code in sorted(STATUS_CODES):
+    count = status_code_counts[status_code]
+    if count > 0:
+      print("%d: %d" % (status_code, count))
 
 try:
-    for line in sys.stdin:
-        try:
-            _, _, _, _, status_code, file_size = line.split()[0:6]
-            status_code = int(status_code)
-            file_size = int(file_size)
-        except (ValueError, IndexError):
-            continue
+  for line in sys.stdin:
+    line_count += 1
 
-        total_file_size += file_size
-        status_code_counts[status_code] += 1
-        lines_processed += 1
+    match = re.match(r'(\d+\.\d+\.\d+\.\d+) - \[([^\]]*)\] "GET /projects/260 HTTP/1.1" (\d+) (\d+)', line)
+    if match:
+      ip_address, date, status_code, file_size = match.groups()
+      total_file_size += int(file_size)
+      status_code_counts[int(status_code)] += 1
 
-        if lines_processed % 10 == 0:
-            print(f'Total file size: File size: {total_file_size}')
-
-            for code in sorted(status_code_counts.keys()):
-                if code in [200, 301, 400, 401, 403, 404, 405, 500]:
-                    print(f'{code}: {status_code_counts[code]}')
+    if line_count % 10 == 0:
+      print_stats()
 
 except KeyboardInterrupt:
-    print('Process interrupted. Exiting...')
-    sys.exit(0)
+  print_stats()
