@@ -1,34 +1,37 @@
 #!/usr/bin/python3
+'''a script that reads stdin line by line and computes metrics'''
+
+
 import sys
-import re
 
-from collections import Counter
-
-STATUS_CODES = [200, 301, 400, 401, 403, 404, 405, 500]
-
-total_file_size = 0
-status_code_counts = Counter()
-line_count = 0
-
-def print_stats():
-  print("Total file size: %d" % total_file_size)
-  for status_code in sorted(STATUS_CODES):
-    count = status_code_counts[status_code]
-    if count > 0:
-      print("%d: %d" % (status_code, count))
+cache = {'200': 0, '301': 0, '400': 0, '401': 0,
+         '403': 0, '404': 0, '405': 0, '500': 0}
+total_size = 0
+counter = 0
 
 try:
-  for line in sys.stdin:
-    line_count += 1
+    for line in sys.stdin:
+        line_list = line.split(" ")
+        if len(line_list) > 4:
+            code = line_list[-2]
+            size = int(line_list[-1])
+            if code in cache.keys():
+                cache[code] += 1
+            total_size += size
+            counter += 1
 
-    match = re.match(r'(\d+\.\d+\.\d+\.\d+) - \[([^\]]*)\] "GET /projects/260 HTTP/1.1" (\d+) (\d+)', line)
-    if match:
-      ip_address, date, status_code, file_size = match.groups()
-      total_file_size += int(file_size)
-      status_code_counts[int(status_code)] += 1
+        if counter == 10:
+            counter = 0
+            print('File size: {}'.format(total_size))
+            for key, value in sorted(cache.items()):
+                if value != 0:
+                    print('{}: {}'.format(key, value))
 
-    if line_count % 10 == 0:
-      print_stats()
+except Exception as err:
+    pass
 
-except KeyboardInterrupt:
-  print_stats()
+finally:
+    print('File size: {}'.format(total_size))
+    for key, value in sorted(cache.items()):
+        if value != 0:
+            print('{}: {}'.format(key, value))
