@@ -35,5 +35,4 @@ def island_perimeter(grid):
             if grid[i][j] == 1:
                 perimeter += check_perimeter(grid, i, j)
 
-    return perimetergit add .
-    git cop
+    return perimetergit
