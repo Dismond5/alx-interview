@@ -1,19 +1,39 @@
 #!/usr/bin/python3
-"""0-island_perimeter module"""
+"""
+Contains a method that returns the perimeter of the
+island described in grid
+"""
+
+
+def check_perimeter(grid, i, j):
+    """
+    check surroundings for water. If water body
+    on boundary, add 1 to perimeter otherwise add 0
+    """
+    mask = 1
+    top = grid[i - 1][j] ^ mask if i > 0 else 1
+    bottom = grid[i + 1][j] ^ mask if i < (len(grid) - 1) else 1
+    left = grid[i][j - 1] ^ mask if j > 0 else 1
+    right = grid[i][j + 1] ^ mask if j < (len(grid[i]) - 1) else 1
+    positions = top + bottom + right + left
+    return positions
 
 
 def island_perimeter(grid):
+    """
+    Calculates the perimeter of an island given a grid
 
+    Args:
+        grid (list): list of lists of integers
+
+    Returns:
+        int: perimeter of island
+    """
     perimeter = 0
     for i in range(len(grid)):
         for j in range(len(grid[i])):
-            if grid[i][j]:
-                if i == 0 or not grid[i - 1][j]:
-                    perimeter += 1
-                if j == 0 or not grid[i][j - 1]:
-                    perimeter += 1
-                if i == len(grid) - 1 or not grid[i + 1][j]:
-                    perimeter += 1
-                if j == len(grid[i]) - 1 or not grid[i][j + 1]:
-                    perimeter += 1
-    return perimeter
+            if grid[i][j] == 1:
+                perimeter += check_perimeter(grid, i, j)
+
+    return perimetergit add .
+    git cop
